@@ -35,7 +35,7 @@ export default {
   props: ["type"],
   data: () => ({
     // message: "",
-    // socket: io("localhost:5000", { transports: ["websocket"] })
+    socket: io("localhost:5000", { transports: ["websocket"] })
   }),
   methods: {
     // getData() {
@@ -54,7 +54,7 @@ export default {
     // }
   },
   mounted() {
-    // this.socket.emit("join_room", "room_access_denied");
+    this.socket.emit("join_room", "room_blink");
     // this.getData();
     if (this.type === "face") {
       setTimeout(() => {
@@ -62,12 +62,13 @@ export default {
       }, 5000);
     } else {
       setTimeout(() => {
+        this.socket.emit("blink_event", "mulai");
         this.$router.push({ path: "/" });
       }, 5000);
     }
   },
   beforeDestroy() {
-    // this.socket.emit("leave_room", "room_access_denied");
+    this.socket.emit("leave_room", "room_blink");
   }
 };
 </script>

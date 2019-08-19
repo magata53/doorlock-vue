@@ -28,7 +28,9 @@ export default {
   methods: {
     getData() {
       this.socket.on("blink_data", data => {
-        if (data) {
+        if (data === "mulai") {
+          // do something
+        } else {
           this.$router.push({ path: "/face" });
         }
       });

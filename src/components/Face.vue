@@ -71,36 +71,43 @@ export default {
   methods: {
     getData() {
       this.socket.on("face_data", data => {
-        this.message = JSON.parse(data);
+        if (data) {
+          this.message = {
+            link: `data:image/jpeg;base64,${JSON.parse(data).link}`,
+            name: JSON.parse(data).name
+          };
+          this.$refs.webcam.stop();
+          this.socket.emit("blink_event", "mulai");
+          setTimeout(() => {
+            this.$router.push({ path: "/" });
+          }, 4000);
+        }
       });
     },
     checkAccess() {
       this.socket.on("access_denied_data", data => {
         if (data) {
-          this.$router.push({
-            name: "access-denied",
-            params: { type: data }
+          setTimeout(() => {
+            this.$router.push({
+              name: "access-denied",
+              params: { type: data }
+            });
           });
         }
       });
     },
     onCapture() {
       this.img = this.$refs.webcam.capture();
-      this.socket.emit("image", this.img);
+      setTimeout(() => {
+        this.socket.emit("image", this.img);
+      }, 100);
     },
     onStarted(stream) {
       setTimeout(() => {
         if (stream) {
           this.onCapture();
-          this.onStop();
         }
       }, 5000);
-    },
-    onStop() {
-      this.$refs.webcam.stop();
-    },
-    onStart() {
-      this.$refs.webcam.start();
     },
     onCameras(cameras) {
       this.devices = cameras;
@@ -108,11 +115,15 @@ export default {
   },
   mounted() {
     this.socket.emit("join_room", "room_face");
+    this.socket.emit("join_room", "room_access_denied");
+    this.socket.emit("join_room", "room_blink");
     this.getData();
     this.checkAccess();
   },
   beforeDestroy() {
     this.socket.emit("leave_room", "room_face");
+    this.socket.emit("leave_room", "room_access_denied");
+    this.socket.emit("leave_room", "room_blink");
   }
 };
 </script>

@@ -33,6 +33,7 @@
 
 <script>
 import io from "socket.io-client";
+import { setTimeout } from "timers";
 export default {
   data: () => ({
     message: "",
@@ -42,15 +43,20 @@ export default {
     getData() {
       this.socket.on("fingerprint_data", data => {
         this.message = JSON.parse(data);
+        setTimeout(() => {
+          this.$router.push({ path: "/" });
+        }, 4000);
       });
     },
     checkAccess() {
       this.socket.on("access_denied_data", data => {
         if (data) {
-          this.$router.push({
-            name: "access-denied",
-            params: { type: data }
-          });
+          setTimeout(() => {
+            this.$router.push({
+              name: "access-denied",
+              params: { type: data }
+            });
+          }, 3000);
         }
       });
     }
